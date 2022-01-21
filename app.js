@@ -273,7 +273,7 @@ var Covid = {
 
     execute: function(groupByDate = true) {
         if (groupByDate) {
-            if ('month' !== CURRENT_URL.searchParams.get('group')) {
+            if (CURRENT_URL.searchParams.has('group') && 'month' !== CURRENT_URL.searchParams.get('group')) {
                 this.groupByDay();
             } else {
                 this.groupByMonth();
