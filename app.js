@@ -28,6 +28,8 @@ let CONFIG = {responsive: true,
     modeBarButtonsToRemove: BUTTONS_TO_REMOVE};
 
 
+const CURRENT_URL = new URL(location.href);
+
 /*
 function printableNumber(x){
     x = Math.round(x);
@@ -106,6 +108,11 @@ function buildChartHospitalisations(){
     Plotly.newPlot('lits_hospitalisations', data, layout, CONFIG);
 }
 */
+
+function unpack(rows, key) {
+    return rows.map(function(row) { return row[key]; });
+}
+
 function objectAsValues(object)
 {
     var keys = Object.keys(object);
@@ -176,153 +183,39 @@ function percent()
     Plotly.newPlot("percent", data, layout);
 }
 
-function vaxVsNoVax()
-{
-    var vax = {};
-    var notVax = {};
-
-    response.forEach(line => {
-        if ('Non-vaccinés' === line.fields.vac_statut) {
-            if (!notVax[line.fields.date]) {
-                notVax[line.fields.date] = 0;
-            }
-
-            notVax[line.fields.date] += line.fields.sc_pcr;
-        } else {
-            if (!vax[line.fields.date]) {
-                vax[line.fields.date] = 0;
-            }
-
-            vax[line.fields.date] += line.fields.sc_pcr;            
-        }
-    });
-
-    var vax = objectAsValues(vax);
-    var notVax = objectAsValues(notVax);
-    data = [
-        {x: vax['keys'], y: vax['values'], mode: "lines", name: 'Vaccinés'},
-        {x: notVax['keys'], y: notVax['values'], mode: "lines", name: 'Non-vaccinés'},
-    ];
-    var layout = {
-        title: "Vaccinés VS non-vaccinés entrés en réanimation",
-    };
-
-    Plotly.newPlot("vaccinated_vs_not_vaccinated", data, layout);
-}
-
 function myGraph()
 {
-    console.log(response);
+    query = Covid.groupByAgeAndVaccinationStatus();
+    const result = query.execute();
 
+    const data = GraphBuilder.generateDataMultidimension(result, {true: 'Non-vaccinés', false: 'Vaccinés'});
 
-    let from20to39 = {};
-    let from40to59 = {};
-    let from60to79 = {};
-    let from80 = {};
-
-    response.forEach(line => {
-        line.fields.sc_pcr = Math.round(line.fields.sc_pcr);
-
-        switch (line.fields.age) {
-            case "[20,39]":
-                if (!from20to39[line.fields.date]) {
-                    from20to39[line.fields.date] = 0;
-                }
-                from20to39[line.fields.date] += line.fields.sc_pcr;
-                break;
-            case "[40,59]":
-                if (!from40to59[line.fields.date]) {
-                    from40to59[line.fields.date] = 0;
-                }
-                from40to59[line.fields.date] += line.fields.sc_pcr;
-                //console.log(line.fields.date, line.fields.sc_pcr, line.fields.age, from40to59[line.fields.date]);
-
-                break;
-            case "[60,79]":
-                if (!from60to79[line.fields.date]) {
-                    from60to79[line.fields.date] = 0;
-                }
-                from60to79[line.fields.date] += line.fields.sc_pcr;
-                break;
-            case "[80;+]":
-                if (!from80[line.fields.date]) {
-                    from80[line.fields.date] = 0;
-                }
-                from80[line.fields.date] += line.fields.sc_pcr;
-                break;
-        }
-        //date0to19 = line.fields.age
-    });
-
-    //console.log(from20to39, from40to59, Object.keys(from20to39), Object.values(from20to39));
-    //console.log(from40to59);
-    console.log(from60to79);
-    from20to39 = objectAsValues(from20to39);
-    from40to59 = objectAsValues(from40to59);
-    from60to79 = objectAsValues(from60to79);
-    from80 = objectAsValues(from80);
-
-
-    data = [
-        {x: from20to39['keys'], type: 'histogram',y: from20to39['values'],  name: '20 à 39 ans'},
-        {x: from40to59['keys'], type: 'histogram', y: from40to59['values'], name: '40 à 59 ans'},
-        {x: from60to79['keys'], type: 'histogram', y: from60to79['values'], name: '60 à 79 ans'},
-        {x: from80['keys'], type: 'histogram', y: from80['values'], name: '80 ans et plus'},
-    ];
     var layout = {
-        title: "Nombre de personnes en soins critiques par age en décembre",
+        title: "Nombre d'entrées en soins critiques par age et status vaccinal",
+    };
+
+    Plotly.newPlot("vaccinated_vs_not_vaccinated_by_age", data, layout);
+}
+
+function vaxVsNoVax()
+{
+
+    query = Covid.vaxVsNoVax();
+    const result = query.execute();
+    const data = GraphBuilder.generateData(result, {true: 'Non-vaccinés', false: 'Vaccinés'});
+
+    var layout = {
+        title: "Nombre d'entrées en soins critiques par status vaccinal",
         xaxis: {
             //autorange: true,
             //range: ['2021-01-01 06:00', '2022-01-15 18:00'],
             title: '',
-            type: 'date'
+            //type: 'date'
         },
-
-        updatemenus: [{
-            x: 0.1,
-            y: 1.15,
-            xref: 'paper',
-            yref: 'paper',
-            yanchor: 'top',
-            active: 0,
-            showactive: true,
-            buttons: [{
-                args: ['xbins.size', 'M1'],
-                label: 'Month',
-                method: 'restyle',
-            }, {
-                args: ['xbins.size', 'M3'],
-                label: 'Quater',
-                method: 'restyle',
-            }, {
-                args: ['xbins.size', 'M6'],
-                label: 'Half Year',
-                method: 'restyle',
-            }, {
-                args: ['xbins.size', 'M12'],
-                label: 'Year',
-                method: 'restyle',
-            }]
-      }]
     };
 
-    Plotly.newPlot("myPlot", data, layout);
+    Plotly.newPlot("vaccinated_vs_not_vaccinated", data, layout);
 }
-
-/*
-download_data();
-function download_data(){
-    var URL = 'https://raw.githubusercontent.com/CovidTrackerFr/covidtracker-data/master/data/france/stats/dataexplorer_compr_france.json';
-    var request = new XMLHttpRequest();
-    request.open('GET', URL);
-    request.responseType = 'json';
-    request.send();
-    request.onload = function() {
-        data_France = request.response;
-        buildChartHospitalisations();
-    }
-}
-*/
 
 downloadPerAge();
 
@@ -336,9 +229,11 @@ function downloadPerAge() {
     request.onload = function() {
         response = request.response;
         Covid.download(response);
+        TableBuilder.buildPercentVaxNotVax();
+        TableBuilder.buildPercentPerAge();
         myGraph();
         vaxVsNoVax();
-        percent();
+        //percent();
         //graphPerMonth();
     }
 }
@@ -346,35 +241,211 @@ function downloadPerAge() {
 
 var Covid = {
     response: [],
+    query: '',
 
     download: function(response) {
         this.response = response;
+        this.query = d3.nest();
     },
 
     groupByAge: function() {
 
-        return d3.nest()
+        this.query
             .key(function(item) { return item.fields.age; })
-            .rollup(function(group) { return {
-                count: d3.sum(group, function(item) { return item.fields.sc_pcr; })
-                };
-            })
-            .entries(this.response)
+            .rollup(function(group) { return d3.sum(group, function(item) { return item.fields.sc_pcr; }); })
         ;
 
+        return this;
+    },
+
+    groupByMonth: function() {
+        this.query.key(function(item) {return item.fields.date.split('-')[0] + '-' + item.fields.date.split('-')[1]; });
+
+        return this;
+    },
+
+
+    groupByDay: function() {
+        this.query.key(function(item) {return item.fields.date; });
+
+        return this;
+    },
+
+    execute: function(groupByDate = true) {
+        if (groupByDate) {
+            if ('month' === CURRENT_URL.searchParams.get('group')) {
+                this.groupByMonth();
+            } else {
+                this.groupByDay();
+            }
+        }
+
+        var rows = this.query.sortKeys(d3.ascending).entries(this.response);
+        this.query = d3.nest(); // reset query
+
+        return rows;
+    },
+
+    vaxVsNoVax: function() {
+        this.query
+        .key(function(item) { return 'Non-vaccinés' === item.fields.vac_statut; })
+        .rollup(function(group) {
+            return d3.sum(group, function(item) { return item.fields.sc_pcr; })
+            //return d3.mean(group, function(item) { console.log(arguments) ;return item.fields.sc_pcr })
+        });
+
+        return this;
+    },
+
+    all: function() {
+        this.query
+        .rollup(function(group) { 
+            return d3.sum(group, function(item) { return item.fields.sc_pcr; })
+        });
+
+        return this;
     },
 
     groupByAgeAndVaccinationStatus: function() {
 
-        var groupByAgeAndVaccination = d3.nest()
+        this.query
         .key(function(item) { return item.fields.age; })
         .key(function(item) { return 'Non-vaccinés' === item.fields.vac_statut; })
-        .rollup(function(group) { return {
-            count: d3.sum(group, function(item) { return item.fields.sc_pcr; })
-            };
-        })
-        .entries(response)
+        .rollup(function(group) { 
+            return d3.sum(group, function(item) { return item.fields.sc_pcr; })
+        });
 
-        return groupByAgeAndVaccination;
+        return this;
     }
 };
+
+var GraphBuilder = {
+    generateDataMultidimension: function(d3Result, labels) {
+        const data = [];
+        d3Result.forEach(item => {
+            item.values.forEach(item2 => {
+                data.push({
+                    name: item['key'] + ' - ' + labels[item2['key']],
+                    x: unpack(item2['values'], 'key'),
+                    y: unpack(item2['values'], 'values'),
+                });
+            });
+        });
+        
+        return data;
+    },
+
+    generateData: function(d3Result, labels) {
+        const data = [];
+        d3Result.forEach(item => {
+            console.log('ll', item);
+            data.push({
+                name: (labels) ? labels[item['key']] : item['key'],
+                x: unpack(item['values'], 'key'),
+                y: unpack(item['values'], 'values'),
+            });
+        });
+
+        return data;
+    }
+}
+
+var TableBuilder = {
+    buildPercentVaxNotVax: function() {
+        const all = Covid.all().groupByMonth().execute(false);
+        const fraction = Covid.vaxVsNoVax().groupByMonth().execute(false);
+
+        // get percent
+        var rows = [];
+        var headers = [];
+        all.forEach((month, monthNumber) => {
+            headers.push(month.key);
+            var columns = [];
+            fraction.forEach((item, j) => {
+                columns.push({
+                    all: month.values,
+                    number: item.values[monthNumber].values,
+                    percent: item.values[monthNumber].values / month.values,
+                }); 
+            });
+            rows.push(columns);
+        });
+
+        console.log('aa', rows, fraction);
+
+        this.buildTable('#table_vax_vs_notvax', headers, rows);
+    },
+
+    buildPercentPerAge() {
+        const all = Covid.all().groupByMonth().execute(false);
+        const ages = Covid.groupByAgeAndVaccinationStatus().groupByMonth().execute(false);
+
+        var rows = [];
+        var headers = [];
+        var label = '';
+
+        // build headers
+        all.forEach(month => {
+            headers.push(month.key);
+        });
+
+        // build rows
+        ages.forEach((age) => {
+            age.values.forEach((vaxStatus, i) => {
+                let row = [];
+                vaxStatus.values.forEach((month, monthI) => {
+                    row.push({
+                        all: Math.round(all[monthI].values),
+                        number: Math.round(month.values),
+                        percent: month.values / Math.round(all[monthI].values)
+                    });
+                });
+                // add new row
+                rows.push(row);
+            });
+        });
+        console.log('buildPercentPerAge', ages, rows);
+
+        labels = [
+            '[0 - 19] AVEC vaccin',
+            '[0 - 19] SANS vaccin',
+            '[20 - 39] AVEC vaccin',
+            '[20 - 39] SANS vaccin',
+            '[40 - 59] AVEC vaccin',
+            '[40 - 59] SANS vaccin',
+            '[60 - 79] AVEC vaccin',
+            '[60 - 79] SANS vaccin',
+            '[80+] AVEC vaccin',
+            '[80+] SANS vaccin',
+        ];
+
+        this.buildTable('#table_percent_age', headers, rows, labels);
+    },
+
+    buildTable: function(tableSelector, headers, rows, labels = []) {
+        const tbody = document.querySelector(tableSelector).querySelector('tbody');
+        const thead = document.querySelector(tableSelector).querySelector('thead');
+
+        // build headers
+        let htmlHead = '';
+        headers.forEach(function(month, i) {
+            if (labels.length > 0 && i === 0) {
+                htmlHead += '<th></th>';                
+            }
+            htmlHead += '<th>'+ month+'</th>';
+        });
+
+        let htmlBody = '';
+        rows.forEach((row, i) => {
+            htmlBody += '<tr>';
+            htmlBody += '<td>'+ labels[i] +'</td>';
+            row.forEach(function(column) {
+                htmlBody += '<td title="'+column.number+' / '+column.all+' personnes">'+ Math.round(column.percent*100) +'%</td>';
+            });
+            htmlBody += '</tr>';
+        });
+
+        thead.insertAdjacentHTML('afterbegin', htmlHead);
+        tbody.insertAdjacentHTML('afterbegin', htmlBody);
+    }
+}

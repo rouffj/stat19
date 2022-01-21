@@ -4,15 +4,37 @@
     <head>
         <meta charset="UTF-8">
 
+        <style>
+            table {
+                border-collapse: collapse;
+            }
+            table td, table th {
+                border: 1px solid #000;
+                padding: 3px 5px;
+            }
+        </style>
 
         <title>Hello</title>
     </head>
     <body>
-        <div id="myDiv" style="width: 95vw; height: 35vw;"></div>
-        <div id="percent" style="width: 95vw; height: 35vw;"></div>
-        <div id="myPlot" style="width: 95vw; height: 35vw;"></div>
         <div id="vaccinated_vs_not_vaccinated" style="width: 95vw; height: 35vw;"></div>
-        
+        <div id="vaccinated_vs_not_vaccinated_by_age" style="width: 95vw; height: 35vw;"></div>
+
+        <h2>Pourcentage d'entrée en réa vaccinés VS non-vaccinés ? </h2>
+
+        <table id="table_vax_vs_notvax">
+            <thead></thead>
+            <tbody>
+
+            </tbody>
+        </table>        
+        <h2>Pour chaque tranche d'âge quel pourcentage représentent-ils des entrées en réa ? </h2>
+        <table id="table_percent_age">
+            <thead></thead>
+            <tbody>
+
+            </tbody>
+        </table> 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdn.plot.ly/plotly-2.4.2.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
