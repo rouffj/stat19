@@ -325,7 +325,7 @@ var GraphBuilder = {
         d3Result.forEach(item => {
             item.values.forEach(item2 => {
                 data.push({
-                    name: item['key'] + ' - ' + labels[item2['key']],
+                    name: item['key'] + ' ' + labels[item2['key']],
                     x: unpack(item2['values'], 'key'),
                     y: unpack(item2['values'], 'values'),
                 });
@@ -363,6 +363,7 @@ var TableBuilder = {
             headers.push(month.key);
         });
 
+        // build rows
         vaxStatuses.forEach(vaxStatus => {
             var row = [];
             vaxStatus.values.forEach((month, monthIndex) => {
@@ -375,7 +376,7 @@ var TableBuilder = {
             rows.push(row);
         });
 
-        this.buildTable('#table_vax_vs_notvax', headers, rows, ['Vaccinés', 'Non vaccinés']);
+        this.buildTable('#table_vax_vs_notvax', headers, rows, ['Vaccinés', 'Non vaccinés', 'Différence']);
     },
 
     buildPercentPerAge() {
