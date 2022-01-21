@@ -353,27 +353,29 @@ var GraphBuilder = {
 var TableBuilder = {
     buildPercentVaxNotVax: function() {
         const all = Covid.all().groupByMonth().execute(false);
-        const fraction = Covid.vaxVsNoVax().groupByMonth().execute(false);
+        const vaxStatuses = Covid.vaxVsNoVax().groupByMonth().execute(false);
 
-        // get percent
         var rows = [];
         var headers = [];
-        all.forEach((month, monthNumber) => {
+
+        // build headers
+        all.forEach(month => {
             headers.push(month.key);
-            var columns = [];
-            fraction.forEach((item, j) => {
-                columns.push({
-                    all: month.values,
-                    number: item.values[monthNumber].values,
-                    percent: item.values[monthNumber].values / month.values,
-                }); 
-            });
-            rows.push(columns);
         });
 
-        console.log('aa', rows, fraction);
+        vaxStatuses.forEach(vaxStatus => {
+            var row = [];
+            vaxStatus.values.forEach((month, monthIndex) => {
+                row.push({
+                    all: Math.round(all[monthIndex].values),
+                    number: month.values,
+                    percent: month.values / Math.round(all[monthIndex].values),
+                });
+            });
+            rows.push(row);
+        });
 
-        this.buildTable('#table_vax_vs_notvax', headers, rows);
+        this.buildTable('#table_vax_vs_notvax', headers, rows, ['Vaccinés', 'Non vaccinés']);
     },
 
     buildPercentPerAge() {
@@ -397,7 +399,7 @@ var TableBuilder = {
                     row.push({
                         all: Math.round(all[monthI].values),
                         number: Math.round(month.values),
-                        percent: month.values / Math.round(all[monthI].values)
+                        percent: month.values / all[monthI].values
                     });
                 });
                 // add new row
@@ -438,7 +440,7 @@ var TableBuilder = {
         let htmlBody = '';
         rows.forEach((row, i) => {
             htmlBody += '<tr>';
-            htmlBody += '<td>'+ labels[i] +'</td>';
+            if (labels[i]) { htmlBody += '<td>'+ labels[i] +'</td>'; }
             row.forEach(function(column) {
                 htmlBody += '<td title="'+column.number+' / '+column.all+' personnes">'+ Math.round(column.percent*100) +'%</td>';
             });
