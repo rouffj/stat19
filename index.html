@@ -20,6 +20,13 @@
             table td, table th {
                 border: 1px solid #000;
                 padding: 3px 5px;
+                text-align: center;
+            }
+
+            td span {
+                font-size: 10px;
+                color: grey;
+                display: block;
             }
             .focus {
                 font-weight: bold;
@@ -33,7 +40,7 @@
             Dernière mise à jour des données: 21/01/2022 <br />
             <small>Source: <a href="https://data.drees.solidarites-sante.gouv.fr/explore/dataset/covid-19-resultats-par-age-issus-des-appariements-entre-si-vic-si-dep-et-vac-si/information/">Données officielles de la DREES</a></small>
         </p>
-        <h3>Pourcentage d'entrée en soins critique vaccinés VS non-vaccinés ? </h3>
+        <h3>Pourcentage d'entrées en soins critique vaccinés VS non-vaccinés ? </h3>
 
         <table id="table_vax_vs_notvax">
             <thead></thead>
@@ -42,7 +49,7 @@
             </tbody>
         </table>        
 
-        <h3>Pour chaque tranche d'âge quel pourcentage représentent-ils des entrées en soins critique ? </h3>
+        <h3>Chaque tranche d'âge représentent combien des entrées en soins critique en pourcentage ? </h3>
         <table id="table_percent_age">
             <thead></thead>
             <tbody>
@@ -71,6 +78,20 @@
 
         <div id="vaccinated_vs_not_vaccinated" style="width: 95vw; height: 35vw;"></div>
         <div id="vaccinated_vs_not_vaccinated_by_age" style="width: 95vw; height: 35vw;"></div>
+
+<hr>
+
+<h2>FAQ</h2>
+
+<h3>Soins critiques VS réanimation ?</h3>
+
+<p>En France il y a les soins critiques qui représentent 19 580 lits. Dans les soins critiques il y 3 services: celui de surveillance continue (8192 lits), celui de soins intensifs (5955 lits) et enfin pour les cas plus graves le service de réanimation (5433 lits).
+</p>
+
+Sources:
+<ul>
+    <li><small><a href="https://www.xn--cfdt-retraits-mhb.fr/Reanimation-et-soins-critiques-un-modele-a-repenser">Réanimation et soins critiques : un modèle à repenser</a></small></li>
+</ul>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdn.plot.ly/plotly-2.4.2.min.js"></script>

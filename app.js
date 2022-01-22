@@ -176,7 +176,7 @@ function percent()
         //{x: total['keys'], y: total['values'], mode: "lines", name: 'total'},
     ];
     var layout = {
-        title: "Pourcentage par tranche d'age en soin critique",
+        title: "Pourcentage par tranche d'âge en soin critique",
         yaxis: { title: "Pourcentage"}
     };
 
@@ -191,7 +191,7 @@ function myGraph()
     const data = GraphBuilder.generateDataMultidimension(result, {true: 'Non-vaccinés', false: 'Vaccinés'});
 
     var layout = {
-        title: "Nombre d'entrées en soins critiques par age et status vaccinal",
+        title: "Nombre d'entrées en soins critiques de personnes par âge et status vaccinal (avec le COVID mais pas forcement à cause du COVID)",
     };
 
     Plotly.newPlot("vaccinated_vs_not_vaccinated_by_age", data, layout);
@@ -205,7 +205,7 @@ function vaxVsNoVax()
     const data = GraphBuilder.generateData(result, {true: 'Non-vaccinés', false: 'Vaccinés'});
 
     var layout = {
-        title: "Nombre d'entrées en soins critiques par status vaccinal",
+        title: "Nombre d'entrées de personnes en soins critiques par status vaccinal (avec le covid mais pas forcement à cause du COVID)",
         xaxis: {
             //autorange: true,
             //range: ['2021-01-01 06:00', '2022-01-15 18:00'],
@@ -443,7 +443,7 @@ var TableBuilder = {
             htmlBody += '<tr>';
             if (labels[i]) { htmlBody += '<td>'+ labels[i] +'</td>'; }
             row.forEach(function(column) {
-                htmlBody += '<td title="'+column.number+' / '+column.all+' personnes">'+ Math.round(column.percent*100) +'%</td>';
+                htmlBody += '<td>'+ Math.round(column.percent*100) +'% <span>'+Math.round(column.number)+' / '+column.all+' pers.</span></td>';
             });
             htmlBody += '</tr>';
         });
